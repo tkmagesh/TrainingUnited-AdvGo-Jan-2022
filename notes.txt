@@ -1,0 +1,25 @@
+Magesh Kuppan
+
+Schedule
+    Start       : 10:00 AM
+    Tea Break   : 11:30 AM (15 mins)
+    Lunch Break : 1:00 PM (45 mins)
+    Tea Break   : 3:00 PM (15 mins)
+    End         : 4:30 PM
+
+Methodolgy:
+    No powerpoints
+    100% hands on driven
+    
+Github Repository:
+    https://github.com/tkmagesh/TrainingUnited-AdvGo-Jan-2022
+
+Noticable features of Go
+    1. higher order functions
+        functions as data
+            a. can assign a function to a variable
+            b. can pass a function as an argument
+
+    2. interface
+    3. goroutines
+    4. error handling
