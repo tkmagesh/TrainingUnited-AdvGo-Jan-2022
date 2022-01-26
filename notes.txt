@@ -23,4 +23,27 @@ Noticable features of Go
 
     2. interface
     3. goroutines
+        Go is a language built for concurrency
+            language features
+                go, chan (data type), <- (chan operator), select, range,
+                sync package
+
     4. error handling
+
+
+Concurrency
+
+Thread T = new System.Threading.Thread(fn);
+T.Start();
+
+Things that should NOT be assumed in concurrent programming
+    1. Never assume the sequence of execution of the goroutines
+    2. Never assume the time taken for a goroutine to complete its task
+
+To detect race conditions
+    go run -race demo-04.go 
+
+        OR
+
+    go build -race demo-04.go
+    ./demo-04
