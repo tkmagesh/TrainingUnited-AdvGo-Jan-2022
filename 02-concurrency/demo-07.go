@@ -8,6 +8,7 @@ import (
 
 var wg sync.WaitGroup
 
+//Communicate by sharing memory (DON'T)
 var opCount int32
 
 func main() {

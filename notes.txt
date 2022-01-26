@@ -47,3 +47,7 @@ To detect race conditions
 
     go build -race demo-04.go
     ./demo-04
+
+Channels
+    Channel read operation is a blocking operation
+    Channel write operation can succeed only if a read operation on the channel is already initiated (conditions apply)
