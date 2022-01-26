@@ -19,6 +19,7 @@ Noticable features of Go
         functions as data
             a. can assign a function to a variable
             b. can pass a function as an argument
+            c. can return a function as a return value
 
     2. interface
     3. goroutines
