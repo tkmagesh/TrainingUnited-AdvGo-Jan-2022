@@ -11,12 +11,13 @@ type Work interface {
 
 type Worker struct {
 	work chan Work
-	wg   sync.WaitGroup
+	wg   *sync.WaitGroup
 }
 
 func New(batchSize int) *Worker {
 	worker := &Worker{
 		work: make(chan Work), /* why NOT a buffered a channel? */
+		wg:   new(sync.WaitGroup),
 	}
 	worker.wg.Add(batchSize)
 	for i := 0; i < batchSize; i++ {
