@@ -28,7 +28,10 @@ func main() {
 	//doServerStreaming(ctx, client)
 
 	/* Client Streaming */
-	doClientStreaming(ctx, client)
+	//doClientStreaming(ctx, client)
+
+	/* Bidirectional Streaming */
+	doBidirectionalStreaming(ctx, client)
 
 }
 
@@ -90,4 +93,61 @@ func doClientStreaming(ctx context.Context, client proto.AppServiceClient) {
 		log.Fatalf("failed to get average: %v", err)
 	}
 	log.Printf("Average is: %v\n", res.GetResult())
+}
+
+func doBidirectionalStreaming(ctx context.Context, client proto.AppServiceClient) {
+	stream, err := client.GreetEveryone(ctx)
+	if err != nil {
+		log.Fatalf("failed to greet everyone: %v", err)
+	}
+	done := make(chan bool)
+	go func() {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				done <- true
+				break
+			}
+			if err != nil {
+				log.Fatalln(err)
+			}
+			log.Printf("Greeting: %v\n", res.GetGreeting())
+		}
+	}()
+
+	users := []proto.UserName{
+		proto.UserName{
+			FirstName: "Magesh",
+			LastName:  "Kuppan",
+		},
+		proto.UserName{
+			FirstName: "Suresh",
+			LastName:  "Kannan",
+		},
+		proto.UserName{
+			FirstName: "Ramesh",
+			LastName:  "Jayaraman",
+		},
+		proto.UserName{
+			FirstName: "Rajesh",
+			LastName:  "Pandit",
+		},
+		proto.UserName{
+			FirstName: "Ganesh",
+			LastName:  "Kumar",
+		},
+	}
+
+	for _, user := range users {
+		log.Printf("Sending user: %v\n", user)
+
+		req := &proto.GreetRequest{
+			User: &user,
+		}
+		if err := stream.Send(req); err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	<-done
 }
