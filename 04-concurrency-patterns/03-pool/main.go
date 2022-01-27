@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"pool-demo/pool"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -19,12 +20,13 @@ func (dbc *DBConnection) Close() error {
 	return nil
 }
 
-var IDCounter int
+var IDCounter int32
 
 func DBConnectionFactory() (io.Closer, error) {
-	IDCounter++
+	atomic.AddInt32(&IDCounter, 1)
 	fmt.Printf("DBConnectionFactory : Creating resource %d\n", IDCounter)
-	return &DBConnection{ID: IDCounter}, nil
+	return &DBConnection{ID: int(IDCounter)}, nil
+
 }
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
 	}
 	wg := &sync.WaitGroup{}
 	wg.Add(clientCount)
-	for i := 0; i < clientCount; i++ {
+	for i := 1; i <= clientCount; i++ {
 		go func(client int) {
 			doWork(client, p)
 			wg.Done()
@@ -47,7 +49,7 @@ func main() {
 	var input string
 	fmt.Scanln(&input)
 	wg.Add(clientCount)
-	for i := 0; i < clientCount; i++ {
+	for i := 1; i <= clientCount; i++ {
 		go func(client int) {
 			doWork(client, p)
 			wg.Done()
@@ -58,6 +60,7 @@ func main() {
 }
 
 func doWork(client int, p *pool.Pool) {
+	fmt.Printf("Client %d: Attempting to acquire a resource\n", client)
 	conn, err := p.Acquire()
 	if err != nil {
 		fmt.Printf("Error %d: %s\n", client, err)
