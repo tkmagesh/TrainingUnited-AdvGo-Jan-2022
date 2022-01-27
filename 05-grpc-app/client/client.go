@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
 )
 
 func main() {
@@ -38,7 +40,10 @@ func main() {
 	//doClientStreaming(ctx, client)
 
 	/* Bidirectional Streaming */
-	doBidirectionalStreaming(ctx, client)
+	//doBidirectionalStreaming(ctx, client)
+
+	//handling timeouts
+	doRequestResponseWithTimeout(ctx, client)
 
 }
 
@@ -157,4 +162,25 @@ func doBidirectionalStreaming(ctx context.Context, client proto.AppServiceClient
 	}
 
 	<-done
+}
+
+func doRequestResponseWithTimeout(ctx context.Context, client proto.AppServiceClient) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, time.Millisecond*500)
+	defer cancel()
+
+	req := &proto.AddRequest{
+		X: 10,
+		Y: 20,
+	}
+	res, err := client.Add(timeoutCtx, req)
+	if err != nil {
+		statusErr, ok := status.FromError(err)
+		if ok && statusErr.Code() == codes.DeadlineExceeded {
+			fmt.Println("Timeout error")
+		} else {
+			log.Fatalf("could not add: %v", err)
+		}
+		log.Fatalln(err)
+	}
+	log.Printf("Result : %d\n", res.GetResult())
 }

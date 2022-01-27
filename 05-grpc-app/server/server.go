@@ -18,6 +18,7 @@ type server struct {
 }
 
 func (s *server) Add(ctx context.Context, req *proto.AddRequest) (*proto.AddResponse, error) {
+	time.Sleep(2 * time.Second) //introducing to simulate timeout
 	x := req.GetX()
 	y := req.GetY()
 	result := x + y
