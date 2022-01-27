@@ -93,3 +93,12 @@ Tools
         brew install protoc-gen-go
         brew install protoc-gen-go-grpc
         
+to generate proxy & stub
+    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/service.proto
+
+Code generated:
+    service.pb.go
+        serialization & deserialization information for the messages
+
+    service_grpc.pb.go
+        proxy & stub for the gRPC service
