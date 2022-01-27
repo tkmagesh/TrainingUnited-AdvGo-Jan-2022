@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
+	"pool-demo/pool"
 	"sync"
 	"time"
 )
@@ -28,6 +30,9 @@ func DBConnectionFactory() (io.Closer, error) {
 func main() {
 	clientCount := 10
 	p, err := pool.New(DBConnectionFactory /* factory */, 5 /* pool size */)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	wg := &sync.WaitGroup{}
 	wg.Add(clientCount)
 	for i := 0; i < clientCount; i++ {
@@ -37,6 +42,19 @@ func main() {
 		}(i)
 	}
 	wg.Wait()
+
+	fmt.Printf("\n Second batch of operations.. hit ENTER to continue \n")
+	var input string
+	fmt.Scanln(&input)
+	wg.Add(clientCount)
+	for i := 0; i < clientCount; i++ {
+		go func(client int) {
+			doWork(client, p)
+			wg.Done()
+		}(i + 10)
+	}
+	wg.Wait()
+	p.Close()
 }
 
 func doWork(client int, p *pool.Pool) {
