@@ -21,12 +21,14 @@ func (dbc *DBConnection) Close() error {
 }
 
 var IDCounter int32
+var mutex sync.Mutex
 
 func DBConnectionFactory() (io.Closer, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	atomic.AddInt32(&IDCounter, 1)
 	fmt.Printf("DBConnectionFactory : Creating resource %d\n", IDCounter)
 	return &DBConnection{ID: int(IDCounter)}, nil
-
 }
 
 func main() {
