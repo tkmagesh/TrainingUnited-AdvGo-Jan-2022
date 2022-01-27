@@ -51,3 +51,12 @@ To detect race conditions
 Channels
     Channel read operation is a blocking operation
     Channel write operation can succeed only if a read operation on the channel is already initiated (conditions apply)
+
+Worker
+    Tasks to be exected in a batch (n at a time)
+
+Runner
+    Tasks to be executed in a given time
+
+Pool
+    Resource pool
