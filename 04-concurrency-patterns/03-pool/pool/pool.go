@@ -8,10 +8,12 @@ import (
 )
 
 type Pool struct {
-	factory   func() (io.Closer, error)
-	resources chan io.Closer
-	mutex     *sync.Mutex
-	closed    bool
+	factory          func() (io.Closer, error)
+	resources        chan io.Closer
+	mutex            *sync.Mutex
+	size             int
+	closed           bool
+	resourcesCreated int
 }
 
 var ErrInvalidPoolSize = errors.New("invalid pool size")
@@ -22,15 +24,39 @@ func New(factory func() (io.Closer, error), poolSize int) (*Pool, error) {
 		return nil, ErrInvalidPoolSize
 	}
 	return &Pool{
-		factory:   factory,
-		resources: make(chan io.Closer, poolSize),
-		mutex:     &sync.Mutex{},
-		closed:    false,
+		factory:          factory,
+		resources:        make(chan io.Closer, poolSize),
+		mutex:            &sync.Mutex{},
+		size:             poolSize,
+		closed:           false,
+		resourcesCreated: 0,
 	}, nil
 }
 
 func (p *Pool) Acquire() (io.Closer, error) {
-	select {
+	/* To limit the # of resources created to the pool size */
+	p.mutex.Lock()
+	{
+		if p.resourcesCreated < p.size {
+			fmt.Println("Acquire : from factory")
+			resource, err := p.factory()
+			if err != nil {
+				p.mutex.Unlock()
+				return nil, err
+			}
+			p.resourcesCreated++
+			p.resources <- resource
+		}
+	}
+	p.mutex.Unlock()
+	resource, ok := <-p.resources
+	if !ok {
+		return nil, ErrPoolClosed
+	}
+	return resource, nil
+
+	/* Creating unlimited number of resources */
+	/* select {
 	case resource, ok := <-p.resources:
 		if !ok {
 			return nil, ErrPoolClosed
@@ -40,7 +66,7 @@ func (p *Pool) Acquire() (io.Closer, error) {
 	default:
 		fmt.Println("Creating a new resource from factory")
 		return p.factory()
-	}
+	} */
 }
 
 func (p *Pool) Release(resource io.Closer) error {
