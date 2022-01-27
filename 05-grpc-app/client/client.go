@@ -9,11 +9,18 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
 
-	clientConn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	certFile := "ssl/ca.crt"
+	creds, sslErr := credentials.NewClientTLSFromFile(certFile, "")
+	if sslErr != nil {
+		log.Fatalf("Failed to create TLS credentials %v", sslErr)
+	}
+	opts := grpc.WithTransportCredentials(creds)
+	clientConn, err := grpc.Dial("localhost:50051", opts)
 	if err != nil {
 		log.Fatalf("unable to connect to the server : %v\n", err)
 	}
