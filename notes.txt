@@ -133,6 +133,8 @@ Distributed Tracing
 OpenTelemetry
     TraceCollectors (Jaeger)
 
-
+go get go.opentelemetry.io/otel
+go get go.opentelemetry.io/otel/exporters/jaeger
+go get go.opentelemetry.io/otel/sdk
 
 
