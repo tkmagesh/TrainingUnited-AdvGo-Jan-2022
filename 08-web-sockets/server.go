@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -50,7 +52,16 @@ func broadcast(msg string) {
 	}
 }
 
+func cleanup() {
+	ticker := time.Tick(5 * time.Second)
+	for range ticker {
+		fmt.Println("connects # : ", len(wsConnections))
+	}
+
+}
+
 func main() {
+	go cleanup()
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.HandleFunc("/chat", wsEndPoint)
 	http.ListenAndServe(":8080", nil)
