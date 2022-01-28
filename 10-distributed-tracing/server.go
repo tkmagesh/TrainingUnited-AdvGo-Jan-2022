@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strings"
@@ -27,11 +28,11 @@ func main() {
 }
 
 func handleSayHello(w http.ResponseWriter, r *http.Request) {
-	_, span := tracer.Start(r.Context(), "sayHello")
+	ctx, span := tracer.Start(r.Context(), "sayHello")
 	defer span.End()
 
 	name := strings.TrimPrefix(r.URL.Path, "/sayHello/")
-	greeting, err := SayHello(name)
+	greeting, err := SayHello(name, ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -41,20 +42,31 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 }
 
 // SayHello creates a greeting for the named person.
-func SayHello(name string) (string, error) {
+func SayHello(name string, ctx context.Context) (string, error) {
+	//accessing the span from the context
+	span := trace.SpanFromContext(ctx)
 	person, err := repo.GetPerson(name)
 	if err != nil {
 		return "", err
 	}
+	span.SetAttributes(
+		attribute.String("name", person.Name),
+		attribute.String("title", person.Title),
+		attribute.String("desc", person.Description),
+	)
 	return FormatGreeting(
 		person.Name,
 		person.Title,
 		person.Description,
+		ctx,
 	), nil
 }
 
 // FormatGreeting combines information about a person into a greeting string.
-func FormatGreeting(name, title, description string) string {
+func FormatGreeting(name, title, description string, ctx context.Context) string {
+	_, childSpan := tracer.Start(ctx, "format-greeting")
+	defer childSpan.End()
+
 	response := "Hello, "
 	if title != "" {
 		response += title + " "
