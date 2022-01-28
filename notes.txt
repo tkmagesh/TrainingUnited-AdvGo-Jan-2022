@@ -115,4 +115,24 @@ Microservices
     go-kit
     go-micro
 
-   
+Code Generation
+
+Distributed Tracing
+    Span
+        Unit of work
+        Encapsulates unique identifier, operation name, start & finish timestamp and any other contextual information (tags, events)
+        (Span can be nested)
+            parent span identifier
+
+    Trace
+        directed graph of spans where the edges between the spans are defined as parent/child relationships
+
+    DistributedContext
+        Contains the tracing identifiers, tags etc that are propagated from parent to child
+
+OpenTelemetry
+    TraceCollectors (Jaeger)
+
+
+
+
