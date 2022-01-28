@@ -137,4 +137,18 @@ go get go.opentelemetry.io/otel
 go get go.opentelemetry.io/otel/exporters/jaeger
 go get go.opentelemetry.io/otel/sdk
 
+TraceProvider
+    Tracer
+        Span
+            attributes (tags)
+            events (logs)
+            links (child spans)
 
+
+Testing
+    go test -v ./...
+    
+    Code Coverage
+    go test ./... --cover
+    go test ./... -coverprofile=coverage.out
+    go tool cover -html=coverage.out
