@@ -9,7 +9,7 @@ import (
 	"distributed-tracing/lib/model"
 )
 
-const dburl = "root:rootuser@tcp(127.0.0.1:3306)/dt-demo"
+const dburl = "root:rootuser@tcp(127.0.0.1:3306)/dtdemo"
 
 // Repository retrieves information about people.
 type Repository struct {
