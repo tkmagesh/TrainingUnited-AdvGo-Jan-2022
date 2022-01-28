@@ -14,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-const dburl = "root:rootuser@tcp(127.0.0.1:3306)/dtdemo"
+const dburl = "root:rootuser@tcp(127.0.0.1:3306)/chapter04"
 
 // Repository retrieves information about people.
 type Repository struct {
@@ -40,13 +40,14 @@ func NewRepository() *Repository {
 // If not found, it still returns a Person object with only name
 // field populated.
 func (r *Repository) GetPerson(name string, ctx context.Context) (model.Person, error) {
+	query := "select title, description from people where name = ?"
 	tracer := otel.GetTracerProvider().Tracer("trace-demo")
 
-	query := "select title, description from people where name = ?"
 	_, span := tracer.Start(ctx, "get-person", trace.WithAttributes(
 		attribute.String("db.statement", query),
 	))
 	defer span.End()
+
 	rows, err := r.db.Query(query, name)
 	if err != nil {
 		return model.Person{}, err

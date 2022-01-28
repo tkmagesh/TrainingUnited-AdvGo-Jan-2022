@@ -45,7 +45,7 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 func SayHello(name string, ctx context.Context) (string, error) {
 	//accessing the span from the context
 	span := trace.SpanFromContext(ctx)
-	person, err := repo.GetPerson(name)
+	person, err := repo.GetPerson(name, ctx)
 	if err != nil {
 		return "", err
 	}
