@@ -102,3 +102,17 @@ Code generated:
 
     service_grpc.pb.go
         proxy & stub for the gRPC service
+
+
+Web Application
+    go apis
+    routing libraries
+        github.com/julienschmidt/httprouter
+        
+    frameworks
+
+Microservices
+    go-kit
+    go-micro
+
+   
